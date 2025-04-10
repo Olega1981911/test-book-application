@@ -40,7 +40,7 @@ API-документация доступна по адресу: `http://localho
    ```
 2. Перейти в каталог проекта:
    ```bash
-   cd your-project-name
+   cd test-book-application
    ```
 3. Запустить приложение:
    ```bash
