@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить книгу</title>
+</head>
+<body>
+<div class="container">
+    <h2>Добавить книгу</h2>
+    <form th:action="@{/books/add}" method="post">
+        <table>
+            <tr>
+                <td><label for="vendorCode">Код поставщика:</label></td>
+                <td><input type="text" id="vendorCode" name="vendorCode" required></td>
+            </tr>
+            <tr>
+                <td><label for="title">Название:</label></td>
+                <td><input type="text" id="title" name="title" required></td>
+            </tr>
+            <tr>
+                <td><label for="year">Год:</label></td>
+                <td><input type="number" id="year" name="year"></td>
+            </tr>
+            <tr>
+                <td><label for="brand">Бренд:</label></td>
+                <td><input type="text" id="brand" name="brand" required></td>
+            </tr>
+            <tr>
+                <td><label for="stock">Количество на складе:</label></td>
+                <td><input type="number" id="stock" name="stock"></td>
+            </tr>
+            <tr>
+                <td><label for="price">Цена:</label></td>
+                <td><input type="number" step="0.01" id="price" name="price"></td>
+            </tr>
+        </table>
+        <button type="submit">Добавить книгу</button>
+    </form>
+</div>
+</body>
+</html>
