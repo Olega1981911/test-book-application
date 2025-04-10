@@ -36,7 +36,7 @@ API-документация доступна по адресу: `http://localho
 
 1. Клонировать репозиторий:
    ```bash
-   git clone https://github.com/your-repo-url.git
+   git clone https://github.com/Olega1981911/test-book-application.git
    ```
 2. Перейти в каталог проекта:
    ```bash
