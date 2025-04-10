@@ -1,6 +1,9 @@
 package com.book.test;
 
 import com.book.test.data.Book;
+import com.book.test.dto.BookCreateDTO;
+import com.book.test.dto.BookDTO;
+import com.book.test.mapper.BookMapper;
 import com.book.test.repository.BookRepository;
 import com.book.test.service.BookService;
 import org.junit.jupiter.api.Test;
@@ -11,8 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -20,13 +22,15 @@ import static org.mockito.Mockito.*;
 public class BookServiceTest {
     @Mock
     private BookRepository bookRepository;
-
     @InjectMocks
     private BookService bookService;
 
+    @Mock
+    private BookMapper bookMapper;
+
     @Test
-    public void whenSavingBookSuccessfully(){
-        Book book = Book.builder()
+    public void whenSavingBookSuccessfully() {
+        BookCreateDTO bookDTO = BookCreateDTO.builder()
                 .vendorCode("12345")
                 .title("Book Title")
                 .year(2025)
@@ -34,49 +38,104 @@ public class BookServiceTest {
                 .stock(100)
                 .price(499.99)
                 .build();
-        when(bookRepository.save(book)).thenReturn(book);
-        Book savedBook = bookService.saveBook(book);
-        assertNotNull(savedBook);
-        assertEquals("Book Title", savedBook.getTitle());
+
+        Book bookEntity = Book.builder()
+                .vendorCode("12345")
+                .title("Book Title")
+                .year(2025)
+                .brand("Издательство")
+                .stock(100)
+                .price(499.99)
+                .build();
+
+        BookDTO savedBookDTOEntity = BookDTO.builder()
+                .vendorCode("12345")
+                .title("Book Title")
+                .year(2025)
+                .brand("Издательство")
+                .stock(100)
+                .price(499.99)
+                .build();
+
+        when(bookRepository.save(any(Book.class))).thenReturn(bookEntity);
+        when(bookMapper.toDTO(any(Book.class))).thenReturn(savedBookDTOEntity);
+        when(bookMapper.toEntity(any(BookCreateDTO.class))).thenReturn(bookEntity);
+
+        BookDTO savedBookDTO = bookService.saveBook(bookDTO);
+
+        assertNotNull(savedBookDTO);
+        assertEquals("Book Title", savedBookDTO.getTitle());
         verify(bookRepository, times(1)).save(any(Book.class));
+        verify(bookMapper, times(1)).toDTO(any(Book.class));
     }
+
     @Test
     void testUpdateBook() {
         Long id = 1L;
-        Book book = new Book();
-        book.setId(id);
-        book.setTitle("Test Book");
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
-        when(bookRepository.save(any(Book.class))).thenReturn(book);
-        Book updatedBook = bookService.updateBook(book);
-        assertNotNull(updatedBook);
-        assertEquals(id, updatedBook.getId());
-        assertEquals("Test Book", updatedBook.getTitle());
+        Book bookEntity = Book.builder()
+                .id(id)
+                .title("Test Book")
+                .vendorCode("12345")
+                .year(2025)
+                .brand("Издательство")
+                .stock(100)
+                .price(499.99)
+                .build();
+
+        BookDTO bookDTO = BookDTO.builder()
+                .id(id)
+                .title("Test Book")
+                .vendorCode("12345")
+                .year(2025)
+                .brand("Издательство")
+                .stock(100)
+                .price(499.99)
+                .build();
+
+        when(bookRepository.findById(id)).thenReturn(Optional.of(bookEntity));
+        when(bookRepository.save(any(Book.class))).thenReturn(bookEntity);
+        when(bookMapper.toDTO(any(Book.class))).thenReturn(bookDTO);
+        when(bookMapper.toEntityFromBookDTO(any(BookDTO.class))).thenReturn(bookEntity);
+
+        BookDTO updatedBookDTO = bookService.updateBook(bookDTO);
+        assertNotNull(updatedBookDTO);
+        assertEquals(id, updatedBookDTO.getId());
+        assertEquals("Test Book", updatedBookDTO.getTitle());
         verify(bookRepository, times(1)).findById(id);
         verify(bookRepository, times(1)).save(any(Book.class));
+        verify(bookMapper, times(1)).toDTO(any(Book.class));
     }
 
     @Test
     void testFindBookById() {
         Long id = 1L;
-        Book book = new Book();
-        book.setId(id);
-        book.setTitle("Test Book");
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
-        Book foundBook = bookService.findBookById(id);
+        Book bookEntity = Book.builder()
+                .id(id)
+                .title("Test Book")
+                .build();
+        BookDTO bookDTO = BookDTO.builder()
+                .id(id)
+                .title("Test Book")
+                .build();
+
+        when(bookRepository.findById(id)).thenReturn(Optional.of(bookEntity));
+        when(bookMapper.toDTO(any(Book.class))).thenReturn(bookDTO);
+
+        BookDTO foundBook = bookService.findBookById(id);
         assertNotNull(foundBook);
         assertEquals(id, foundBook.getId());
         assertEquals("Test Book", foundBook.getTitle());
         verify(bookRepository, times(1)).findById(id);
+        verify(bookMapper, times(1)).toDTO(any(Book.class));
     }
 
     @Test
-    void testRemoveBook() {
+    void testRemoveBookFailure() {
         Long id = 1L;
-        when(bookRepository.existsById(id)).thenReturn(true);
-        bookService.removeBook(id);
+        when(bookRepository.existsById(id)).thenReturn(false);
+        assertThrows(RuntimeException.class, () -> bookService.removeBook(id));
         verify(bookRepository, times(1)).existsById(id);
-        verify(bookRepository, times(1)).deleteById(id);
+        verify(bookRepository, never()).deleteById(id);
     }
 
 }

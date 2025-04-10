@@ -1,6 +1,8 @@
 package com.book.test.controller;
 
 import com.book.test.data.Book;
+import com.book.test.dto.BookCreateDTO;
+import com.book.test.dto.BookDTO;
 import com.book.test.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class BookWebController {
                             @RequestParam(required = false) String brand,
                             @RequestParam(required = false) Integer year,
                             @RequestParam Pageable pageable) {
-        Page<Book> books = bookService.findAllBooks(title, brand, year, pageable);
+        Page<BookDTO> books = bookService.findAllBooks(title, brand, year, pageable);
         model.addAttribute("books", books);
         return "books";
 
@@ -36,20 +38,20 @@ public class BookWebController {
     }
 
     @PostMapping("/add")
-    public String addBook(@ModelAttribute Book book) {
+    public String addBook(@ModelAttribute BookCreateDTO book) {
         bookService.saveBook(book);
         return "redirect:/books";
     }
 
     @GetMapping("/edit/{id}")
     public String editBook(@PathVariable Long id, Model model) {
-        Book book = bookService.findBookById(id);
+        BookDTO book = bookService.findBookById(id);
         model.addAttribute("book", book);
         return "editBook";
     }
 
     @PostMapping("/edit/{id}")
-    public String updateBook(@PathVariable Long id, @Valid @ModelAttribute Book book, BindingResult resul) {
+    public String updateBook(@PathVariable Long id, @Valid @ModelAttribute BookDTO book, BindingResult resul) {
         if (resul.hasErrors()) {
             return "editBook";
         }

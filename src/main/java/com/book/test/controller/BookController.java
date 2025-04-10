@@ -1,6 +1,7 @@
 package com.book.test.controller;
 
-import com.book.test.data.Book;
+import com.book.test.dto.BookCreateDTO;
+import com.book.test.dto.BookDTO;
 import com.book.test.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,33 +19,33 @@ public class BookController {
 
 
     @GetMapping
-    public ResponseEntity<Page<Book>> findAll(@RequestParam(required = false) String title,
-                                              @RequestParam(required = false) String brand,
-                                              @RequestParam(required = false) Integer year,
-                                              @RequestParam Pageable pageable
+    public ResponseEntity<Page<BookDTO>> findAll(@RequestParam(required = false) String title,
+                                                 @RequestParam(required = false) String brand,
+                                                 @RequestParam(required = false) Integer year,
+                                                 @RequestParam Pageable pageable
                                               ) {
 
         return ResponseEntity.ok(bookService.findAllBooks(title, brand, year, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findById(@PathVariable Long id) {
+    public ResponseEntity<BookDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.findBookById(id));
     }
     @GetMapping("/title/{title}")
-    public ResponseEntity<Book> findBookByTitle(@PathVariable String title) {
+    public ResponseEntity<BookDTO> findBookByTitle(@PathVariable String title) {
         return ResponseEntity.ok(bookService.findBookByTitle(title));
     }
 
 
     @PostMapping
-    public ResponseEntity<Book> create(@RequestBody Book book) {
+    public ResponseEntity<BookDTO> create(@RequestBody BookCreateDTO book) {
         return ResponseEntity.ok(bookService.saveBook(book));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Book> update(@PathVariable Long id, @RequestBody Book book) {
-        book.setId(id);
-        return ResponseEntity.ok(bookService.updateBook(book));
+    public ResponseEntity<BookDTO> update(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+        bookDTO.setId(id);
+        return ResponseEntity.ok(bookService.updateBook(bookDTO));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
