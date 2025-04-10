@@ -31,7 +31,7 @@ public class BookService {
     public Book findBookByTitle(String title) {
         if (title == null || title.isEmpty()) {
             throw new RuntimeException("Заголовок не может быть пустым");
-        };
+        }
         return bookRepository.findByTitle(title).orElseThrow(() -> new RuntimeException("Книга не найдена"));
     }
 
